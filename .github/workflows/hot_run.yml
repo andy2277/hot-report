@@ -1,0 +1,20 @@
+name:每日热搜汇总
+on:
+  workflow_dispatch:
+  schedule:
+    # UTC时间 0点=北京时间早上8点，按需修改
+    - cron: '0 0 * * *'
+
+jobs:
+  run_hot:
+    runs-on: ubuntu‑latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup‑python@v5
+        with:
+          python‑version: "3.11"
+      - run: pip install -r requirements.txt
+      - name:执行热搜脚本
+        env:
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+        run: python hot_report.py
