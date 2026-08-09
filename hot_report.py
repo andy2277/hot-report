@@ -4,65 +4,57 @@ import os
 PUSHPLUS_TOKEN = ""
 
 def get_weibo_hot():
-    """微博热搜"""
-    headers = {
-        "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-    url = "https://weibo.com/ajax/side/hotSearch"
+    """微博热搜（第三方中转接口，兼容海外）"""
+    headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36"}
+    url = "https://api.vvhan.com/api/hotlist/wbHot"
     try:
-        resp = requests.get(url,headers=headers,timeout=10)
+        resp = requests.get(url,headers=headers,timeout=12)
         json_data = resp.json()
         ret = []
-        for item in json_data["data"]["realtime"]:
-            ret.append({"title":item["word"],"hot":item.get("num",0)})
-        return ret[:12]
+        for item in json_data["data"][:12]:
+            ret.append({"title":item["title"],"hot":item.get("hot","-")})
+        return ret
     except Exception as e:
         return [{"title":"微博热榜获取失败","hot":str(e)}]
 
 def get_zhihu_hot():
     """知乎热榜"""
-    headers = {
-        "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-    url = "https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=12"
+    headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36"}
+    url = "https://api.vvhan.com/api/hotlist/zhihuHot"
     try:
-        resp = requests.get(url,headers=headers,timeout=10)
+        resp = requests.get(url,headers=headers,timeout=12)
         json_data = resp.json()
         ret = []
-        for item in json_data["data"]:
-            ret.append({"title":item["target"]["title"],"hot":item["target"]["heat"]})
+        for item in json_data["data"][:12]:
+            ret.append({"title":item["title"],"hot":item.get("hot","-")})
         return ret
     except Exception as e:
         return [{"title":"知乎热榜获取失败","hot":str(e)}]
 
 def get_bilibili_hot():
     """B站热榜"""
-    headers = {
-        "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-    url = "https://api.bilibili.com/x/web-interface/popular"
+    headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36"}
+    url = "https://api.vvhan.com/api/hotlist/bilibiliHot"
     try:
-        resp = requests.get(url,headers=headers,timeout=10)
+        resp = requests.get(url,headers=headers,timeout=12)
         json_data = resp.json()
         ret = []
-        for item in json_data["data"]["list"][:12]:
-            ret.append({"title":item["title"],"hot":item["play"]})
+        for item in json_data["data"][:12]:
+            ret.append({"title":item["title"],"hot":item.get("hot","-")})
         return ret
     except Exception as e:
         return [{"title":"B站热榜获取失败","hot":str(e)}]
 
 def get_douyin_hot():
-    """抖音热榜（公开网页接口）"""
-    headers = {
-        "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-    url = "https://www.douyin.com/aweme/v1/web/hot/search/list/"
+    """抖音热榜"""
+    headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36"}
+    url = "https://api.vvhan.com/api/hotlist/douyinHot"
     try:
-        resp = requests.get(url,headers=headers,timeout=10)
+        resp = requests.get(url,headers=headers,timeout=12)
         json_data = resp.json()
         ret = []
-        for item in json_data["data"]["word_list"][:12]:
-            ret.append({"title":item["word"],"hot":item["hot_value"]})
+        for item in json_data["data"][:12]:
+            ret.append({"title":item["title"],"hot":item.get("hot","-")})
         return ret
     except Exception as e:
         return [{"title":"抖音热榜获取失败","hot":str(e)}]
@@ -83,7 +75,7 @@ def build_hot_html(weibo,zhihu,bilibili,douyin):
 
     html += "<h3>📺B站热榜</h3><ol>"
     for idx,i in enumerate(bilibili,1):
-        html += f"<li>{i['title']} ｜播放:{i['hot']}</li>"
+        html += f"<li>{i['title']} ｜热度:{i['hot']}</li>"
     html += "</ol><hr/>"
 
     html += "<h3>🎵抖音热榜</h3><ol>"
@@ -91,7 +83,7 @@ def build_hot_html(weibo,zhihu,bilibili,douyin):
         html += f"<li>{i['title']} ｜热度:{i['hot']}</li>"
     html += "</ol>"
 
-    html += "<p><small>数据来自各平台公开接口，仅供阅读，不构成任何建议。接口随时可能变更，获取失败属于正常。</small></p>"
+    html += "<p><small>数据来源第三方公开接口，仅供个人学习阅读，接口存在可用性风险。</small></p>"
     return html
 
 def send_wechat(html_content, token):
@@ -105,7 +97,6 @@ def send_wechat(html_content, token):
     print("推送返回：",res.text)
 
 if __name__ == "__main__":
-    # 强制设置环境编码，防止Linux下ASCII编码报错
     os.environ["PYTHONIOENCODING"] = "utf-8"
     print("开始抓取各平台热搜……")
     wb = get_weibo_hot()
