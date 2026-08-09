@@ -6,7 +6,7 @@ PUSHPLUS_TOKEN = ""
 def get_weibo_hot():
     """微博热搜"""
     headers = {
-        "User‑Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
     url = "https://weibo.com/ajax/side/hotSearch"
     try:
@@ -22,7 +22,7 @@ def get_weibo_hot():
 def get_zhihu_hot():
     """知乎热榜"""
     headers = {
-        "User‑Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
     url = "https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=12"
     try:
@@ -38,9 +38,9 @@ def get_zhihu_hot():
 def get_bilibili_hot():
     """B站热榜"""
     headers = {
-        "User‑Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
-    url = "https://api.bilibili.com/x/web‑interface/popular"
+    url = "https://api.bilibili.com/x/web-interface/popular"
     try:
         resp = requests.get(url,headers=headers,timeout=10)
         json_data = resp.json()
@@ -54,7 +54,7 @@ def get_bilibili_hot():
 def get_douyin_hot():
     """抖音热榜（公开网页接口）"""
     headers = {
-        "User‑Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
     url = "https://www.douyin.com/aweme/v1/web/hot/search/list/"
     try:
@@ -105,6 +105,8 @@ def send_wechat(html_content, token):
     print("推送返回：",res.text)
 
 if __name__ == "__main__":
+    # 强制设置环境编码，防止Linux下ASCII编码报错
+    os.environ["PYTHONIOENCODING"] = "utf-8"
     print("开始抓取各平台热搜……")
     wb = get_weibo_hot()
     zh = get_zhihu_hot()
